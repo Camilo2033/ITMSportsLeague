@@ -20,5 +20,8 @@ namespace SportsLeague.Domain.Entities
 
         public DateTime FoundedDate { get; set; }
 
+        // Navigation Property
+        public ICollection<Player> Players { get; set; } = new List<Player>();
+
     }
 }
