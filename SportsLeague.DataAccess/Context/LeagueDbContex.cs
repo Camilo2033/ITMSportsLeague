@@ -40,6 +40,8 @@ namespace SportsLeague.DataAccess.Context
         public DbSet<Goal> Goals => Set<Goal>();
         public DbSet<Card> Cards => Set<Card>();
 
+        public DbSet<MatchLineup> MatchLineups => Set<MatchLineup>();
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
 
@@ -448,6 +450,42 @@ namespace SportsLeague.DataAccess.Context
                 });
 
 
+                // ── MatchLineup Configuration ──
+
+                modelBuilder.Entity<MatchLineup>(entity =>
+                {
+                    entity.HasKey(ml => ml.Id);
+
+                    entity.Property(ml => ml.Position)
+                        .IsRequired()
+                        .HasMaxLength(10);
+
+                    entity.Property(ml => ml.IsStarter)
+                        .IsRequired();
+
+                    entity.Property(ml => ml.CreatedAt)
+                        .IsRequired();
+
+                    entity.Property(ml => ml.UpdatedAt)
+                        .IsRequired(false);
+
+                    // FK → Match
+                    entity.HasOne(ml => ml.Match)
+                        .WithMany()
+                        .HasForeignKey(ml => ml.MatchId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    // FK → Player
+                    entity.HasOne(ml => ml.Player)
+                        .WithMany()
+                        .HasForeignKey(ml => ml.PlayerId)
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    // Índice único compuesto: un jugador solo puede aparecer
+                    // una vez por partido (igual que TournamentTeam en Fase 3)
+                    entity.HasIndex(ml => new { ml.MatchId, ml.PlayerId })
+                        .IsUnique();
+                });
 
 
 
